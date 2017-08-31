@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Backend Development - RxTender User Manual</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Backend Development";
+    var mkdocs_page_input_path = "backend_dev.md";
+    var mkdocs_page_url = "/backend_dev/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> RxTender User Manual</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../rationale/">Rationale</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../get_started/">Get Started</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../com_pattern/">Communication Patterns</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../language/">Language</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../backend_base/">Base Backend</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Backend Development</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#backend-structure">Backend Structure</a></li>
+    
+
+    <li class="toctree-l2"><a href="#messages">Messages</a></li>
+    
+
+    <li class="toctree-l2"><a href="#serialization">Serialization</a></li>
+    
+
+    <li class="toctree-l2"><a href="#streams">Streams</a></li>
+    
+
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">RxTender User Manual</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Backend Development</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="backend-structure">Backend Structure</h2>
+<p>python package, jinja2 template engine for code generation.</p>
+<p>The source layout of a backend is the following one:</p>
+<pre><code>rtx_backend_foo
+    /[language[-framework]]            
+        /transport
+        /framing
+        /serialization
+        /observable
+            /source
+            /sink
+</code></pre>
+<p>where foo is the name of the backend, [language] is the name of a programming
+language. There is one [language] module per programmming language supported by
+the backend. An optional "framework" name can be provided if different
+frameworks of a language are supported and they must generate different code.</p>
+<p>All templates follow the same naming convention:</p>
+<blockquote>
+<p>[output type].[template type].tpl</p>
+</blockquote>
+<p>[output type] is the type of file to generate. All backends implement the
+"source" output type. The "source" templates generate source code. If the
+selected language also needs other files types to be generated, then additional
+output type templates can be implemented. For example with C or C++ a header
+file is also needed. So these languages also implement "header" output types. So
+a backend with support for c contains "source.content.tpl" and "header.content.tpl"
+templates in the serialization modules.</p>
+<h2 id="messages">Messages</h2>
+<ul>
+<li>stream creation request</li>
+<li>stream creation ack</li>
+<li>stream creation nack</li>
+<li>stream deletion request</li>
+<li>stream deletion ack</li>
+<li>next item publish</li>
+<li>stream complete</li>
+<li>stream error</li>
+</ul>
+<h2 id="serialization">Serialization</h2>
+<ul>
+<li>header.tpl</li>
+<li>content.tpl</li>
+<li>footer.tpl</li>
+</ul>
+<h2 id="streams">Streams</h2>
+<p>Streams generate Observables proxies that follow the <a href="http://reactivex.io/documentation/contract.html">Observable Contract</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../backend_base/" class="btn btn-neutral" title="Base Backend"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../backend_base/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>

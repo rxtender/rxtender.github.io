@@ -1,0 +1,134 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "RxTender is code generator for reactive oriented inter-process and\ninter-machine communication. The idea of RxTender came after trying many IPC\nand RPC protocols and code generators. Some of them were flexible but non\nproductive to use, while others were easy to use but too restricted.\n\n\nRxTender is based on the idea of allowing implementing Reactive Stream APIs\nover inter-process and network communication for any language, any transport\nprotocol, and any serialization. One of the main benefits of RxtTender is that\nyou can easily extend it for your development environment and save a lot of\ntime.",
+            "title": "Introduction"
+        },
+        {
+            "location": "/rationale/",
+            "text": "RxTender is built on the following ideas:\n\n\n\n\nAn IDL is used to specify reactive stream.\n\n\nThere is a clear separation between:\n\n\nserialization\n\n\ntransport\n\n\nstream APIs\n\n\n\n\n\n\nIt is possible to generate source and sink streams (c.f. ).\n\n\nExtensible to new programming languages, serialization and transport protocols.\n\n\n\n\nRXtender allows only to generate code for stream source and sinks. However it\nis designed to be easily extensible to new programming languages and transports.",
+            "title": "Rationale"
+        },
+        {
+            "location": "/get_started/",
+            "text": "Python server\n\n\nrxtender \\\n--framing rxt_backend_base.python3.framing.newline \\\n--serialization rxt_backend_base.python3.serialization.json \\\n--stream rxt_backend_base.python3.stream \\\n--input counter.rxt > counter_rxt.py\n\n\n\n\nimport asyncio\n\nclass CounterServerProtocol(asyncio.Protocol):\n    def connection_made(self, transport):\n        peername = transport.get_extra_info('peername')\n        print('Connection from {}'.format(peername))\n        self.transport = transport\n\n    def connection_lost(self, exc):\n        return\n\n    def data_received(self, data):\n        message = data.decode()\n        print('Data received: {!r}'.format(message))\n\nloop = asyncio.get_event_loop()\n# Each client connection will create a new protocol instance\ncoro = loop.create_server(CounterServerProtocol, '127.0.0.1', 9999)\nserver = loop.run_until_complete(coro)\n\n# Serve requests until Ctrl+C is pressed\nprint('Serving on {}'.format(server.sockets[0].getsockname()))\ntry:\n    loop.run_forever()\nexcept KeyboardInterrupt:\n    pass\n\n# Close the server\nserver.close()\nloop.run_until_complete(server.wait_closed())\nloop.close()\n\n\n\n\ncreate the message router:\n\n\ndef connection_made(self, transport):\n    [...]\n    self.router = Router(transport\n\n\n\n\nadd framing support:\n\n\nclass FramedTransport(object):\n    def __init__(self, tramsport):\n        self.transport = transport\n\n    def write(self, data):\n        self.transport.write(frame(data))\n\n\n\n\nNodeJS client\n\n\nvar net = require('net');\n\nvar HOST = '127.0.0.1';\nvar PORT = 9999;\n\nvar client = new net.Socket();\nclient.connect(PORT, HOST, function() {\n    console.log('CONNECTED TO: ' + HOST + ':' + PORT);\n});\n\nclient.on('data', function(data) {\n    console.log('DATA: ' + data);\n});\n\nclient.on('close', function() {\n    console.log('Connection closed');\n});",
+            "title": "Get Started"
+        },
+        {
+            "location": "/get_started/#python-server",
+            "text": "rxtender \\\n--framing rxt_backend_base.python3.framing.newline \\\n--serialization rxt_backend_base.python3.serialization.json \\\n--stream rxt_backend_base.python3.stream \\\n--input counter.rxt > counter_rxt.py  import asyncio\n\nclass CounterServerProtocol(asyncio.Protocol):\n    def connection_made(self, transport):\n        peername = transport.get_extra_info('peername')\n        print('Connection from {}'.format(peername))\n        self.transport = transport\n\n    def connection_lost(self, exc):\n        return\n\n    def data_received(self, data):\n        message = data.decode()\n        print('Data received: {!r}'.format(message))\n\nloop = asyncio.get_event_loop()\n# Each client connection will create a new protocol instance\ncoro = loop.create_server(CounterServerProtocol, '127.0.0.1', 9999)\nserver = loop.run_until_complete(coro)\n\n# Serve requests until Ctrl+C is pressed\nprint('Serving on {}'.format(server.sockets[0].getsockname()))\ntry:\n    loop.run_forever()\nexcept KeyboardInterrupt:\n    pass\n\n# Close the server\nserver.close()\nloop.run_until_complete(server.wait_closed())\nloop.close()  create the message router:  def connection_made(self, transport):\n    [...]\n    self.router = Router(transport  add framing support:  class FramedTransport(object):\n    def __init__(self, tramsport):\n        self.transport = transport\n\n    def write(self, data):\n        self.transport.write(frame(data))",
+            "title": "Python server"
+        },
+        {
+            "location": "/get_started/#nodejs-client",
+            "text": "var net = require('net');\n\nvar HOST = '127.0.0.1';\nvar PORT = 9999;\n\nvar client = new net.Socket();\nclient.connect(PORT, HOST, function() {\n    console.log('CONNECTED TO: ' + HOST + ':' + PORT);\n});\n\nclient.on('data', function(data) {\n    console.log('DATA: ' + data);\n});\n\nclient.on('close', function() {\n    console.log('Connection closed');\n});",
+            "title": "NodeJS client"
+        },
+        {
+            "location": "/com_pattern/",
+            "text": "Publish Subscribe\n\n\n\n\nRequest Response\n\n\n\n\nTrigger Publish",
+            "title": "Communication Patterns"
+        },
+        {
+            "location": "/com_pattern/#publish-subscribe",
+            "text": "",
+            "title": "Publish Subscribe"
+        },
+        {
+            "location": "/com_pattern/#request-response",
+            "text": "",
+            "title": "Request Response"
+        },
+        {
+            "location": "/com_pattern/#trigger-publish",
+            "text": "",
+            "title": "Trigger Publish"
+        },
+        {
+            "location": "/language/",
+            "text": "Defining an Item\n\n\nitem Status {\n    id :string;\n    value :int32;\n}\n\n\n\nAdding Comments\n\n\n    //\n    /* */\n\n\n\nScalar Types\n\n\n\n\n\n\n\n\nType\n\n\nDefinition\n\n\nDefault value\n\n\n\n\n\n\n\n\n\n\nbool\n\n\nA boolean\n\n\nfalse\n\n\n\n\n\n\ndouble\n\n\nA double precision real number\n\n\n0.0\n\n\n\n\n\n\ni32\n\n\nA signed 32bits integer\n\n\n0\n\n\n\n\n\n\nu32\n\n\nAn unsigned 32bits integer\n\n\n0\n\n\n\n\n\n\ni64\n\n\nA signed 64bits integer\n\n\n0\n\n\n\n\n\n\nu64\n\n\nAn unsigned 32bits integer\n\n\n0\n\n\n\n\n\n\nstring\n\n\nAn UTF8 string\n\n\nempty string\n\n\n\n\n\n\n\n\nLists\n\n\nitem StatusList {\n    list :list<Status>;\n}\n\n\n\nDefining A Stream\n\n\nstream State() -> Status;\n\n\n\nA stream can have the same name than a message\n\n\nAny message that\n\n\nNaming convention\n\n\nitems and streams are CamelCase.",
+            "title": "Language"
+        },
+        {
+            "location": "/language/#defining-an-item",
+            "text": "item Status {\n    id :string;\n    value :int32;\n}",
+            "title": "Defining an Item"
+        },
+        {
+            "location": "/language/#adding-comments",
+            "text": "//\n    /* */",
+            "title": "Adding Comments"
+        },
+        {
+            "location": "/language/#scalar-types",
+            "text": "Type  Definition  Default value      bool  A boolean  false    double  A double precision real number  0.0    i32  A signed 32bits integer  0    u32  An unsigned 32bits integer  0    i64  A signed 64bits integer  0    u64  An unsigned 32bits integer  0    string  An UTF8 string  empty string",
+            "title": "Scalar Types"
+        },
+        {
+            "location": "/language/#lists",
+            "text": "item StatusList {\n    list :list<Status>;\n}",
+            "title": "Lists"
+        },
+        {
+            "location": "/language/#defining-a-stream",
+            "text": "stream State() -> Status;  A stream can have the same name than a message  Any message that",
+            "title": "Defining A Stream"
+        },
+        {
+            "location": "/language/#naming-convention",
+            "text": "items and streams are CamelCase.",
+            "title": "Naming convention"
+        },
+        {
+            "location": "/backend_base/",
+            "text": "Serialization\n\n\nJSON\n\n\nCreation message:\n\n\n{\n    \"title\": \"Create Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'create'\",\n            \"type\": \"string\"\n        },\n        \"streamType\": {\n            \"description\": \"The type of stream to create\",\n            \"type\": \"string\"\n        },\n        \"streamId\": {\n          \"description\": \"Id of the stream to create\",\n          \"type\": \"number\"\n        }\n    },\n    \"required\": [\"what\", \"streamType\"]\n}\n\n\n\nexample:\n\n\n{\n    \"what\": \"create\",\n    \"streamType\": \"ClockTickStream\",\n    \"id\": 42,\n    \"args\": []\n}\n\n\n\nCreation success message:\n\n\nexample:\n\n\n{\n    \"what\": \"createAck\",\n    \"streamId\": 42\n}\n\n\n\nCreation failure message:\n\n\nexample:\n\n\n{\n    \"what\": \"createNack\",\n    \"streamId\": 42,\n    \"reason\": \"nomem\"\n}\n\n\n\nDeletion message:\n\n\n{\n    \"title\": \"Delete Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'delete'\",\n            \"type\": \"string\"\n        },\n        \"streamId\": {\n          \"description\": \"Id of the stream to delete\",\n          \"type\": \"number\"\n        }\n    },\n    \"required\": [\"what\", \"streamId\"]\n}\n\n\n\nexample:\n\n\n{\n    \"what\": \"delete\",\n    \"id\": 42\n}\n\n\n\nDeletion success message:\n\n\nexample:\n\n\n{\n    \"what\": \"deleteAck\",\n    \"streamId\": 42\n}\n\n\n\nNext item message:\n\n\n{\n    \"title\": \"Next Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'next'\",\n            \"type\": \"string\"\n        },\n        \"item\": {\n            \"description\": \"the serialized item\",\n            \"type\": \"object\"\n        },\n    },\n    \"required\": [\"what\", \"item\"]\n}\n\n\n\nexample:\n\n\n{\n    \"what\": \"next\",\n    \"item\": {\n        \"foo\": 42,\n        \"bar\": \"buzz\"\n      }\n}\n\n\n\nCompleted item message:\n\n\n{\n    \"title\": \"Completed Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'completed'\",\n            \"type\": \"string\"\n        },\n    },\n    \"required\": [\"what\"]\n}\n\n\n\nexample:\n\n\n{\n    \"what\": \"completed\"\n}\n\n\n\nError item message:\n\n\n{\n    \"title\": \"Error Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'error'\",\n            \"type\": \"string\"\n        },\n        \"message\": {\n            \"description\": \"A message containing information about the error\",\n            \"type\": \"string\"\n        },\n    },\n    \"required\": [\"what\", \"message\"]\n}\n\n\n\nexample:\n\n\n{\n    \"what\": \"completed\"\n}\n\n\n\nPython\n\n\nES2015",
+            "title": "Base Backend"
+        },
+        {
+            "location": "/backend_base/#serialization",
+            "text": "",
+            "title": "Serialization"
+        },
+        {
+            "location": "/backend_base/#json",
+            "text": "Creation message:  {\n    \"title\": \"Create Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'create'\",\n            \"type\": \"string\"\n        },\n        \"streamType\": {\n            \"description\": \"The type of stream to create\",\n            \"type\": \"string\"\n        },\n        \"streamId\": {\n          \"description\": \"Id of the stream to create\",\n          \"type\": \"number\"\n        }\n    },\n    \"required\": [\"what\", \"streamType\"]\n}  example:  {\n    \"what\": \"create\",\n    \"streamType\": \"ClockTickStream\",\n    \"id\": 42,\n    \"args\": []\n}  Creation success message:  example:  {\n    \"what\": \"createAck\",\n    \"streamId\": 42\n}  Creation failure message:  example:  {\n    \"what\": \"createNack\",\n    \"streamId\": 42,\n    \"reason\": \"nomem\"\n}  Deletion message:  {\n    \"title\": \"Delete Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'delete'\",\n            \"type\": \"string\"\n        },\n        \"streamId\": {\n          \"description\": \"Id of the stream to delete\",\n          \"type\": \"number\"\n        }\n    },\n    \"required\": [\"what\", \"streamId\"]\n}  example:  {\n    \"what\": \"delete\",\n    \"id\": 42\n}  Deletion success message:  example:  {\n    \"what\": \"deleteAck\",\n    \"streamId\": 42\n}  Next item message:  {\n    \"title\": \"Next Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'next'\",\n            \"type\": \"string\"\n        },\n        \"item\": {\n            \"description\": \"the serialized item\",\n            \"type\": \"object\"\n        },\n    },\n    \"required\": [\"what\", \"item\"]\n}  example:  {\n    \"what\": \"next\",\n    \"item\": {\n        \"foo\": 42,\n        \"bar\": \"buzz\"\n      }\n}  Completed item message:  {\n    \"title\": \"Completed Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'completed'\",\n            \"type\": \"string\"\n        },\n    },\n    \"required\": [\"what\"]\n}  example:  {\n    \"what\": \"completed\"\n}  Error item message:  {\n    \"title\": \"Error Message\",\n    \"type\": \"object\",\n    \"properties\": {\n        \"what\": {\n            \"description\": \"the message type. Value is 'error'\",\n            \"type\": \"string\"\n        },\n        \"message\": {\n            \"description\": \"A message containing information about the error\",\n            \"type\": \"string\"\n        },\n    },\n    \"required\": [\"what\", \"message\"]\n}  example:  {\n    \"what\": \"completed\"\n}",
+            "title": "JSON"
+        },
+        {
+            "location": "/backend_base/#python",
+            "text": "",
+            "title": "Python"
+        },
+        {
+            "location": "/backend_base/#es2015",
+            "text": "",
+            "title": "ES2015"
+        },
+        {
+            "location": "/backend_dev/",
+            "text": "Backend Structure\n\n\npython package, jinja2 template engine for code generation.\n\n\nThe source layout of a backend is the following one:\n\n\nrtx_backend_foo\n    /[language[-framework]]            \n        /transport\n        /framing\n        /serialization\n        /observable\n            /source\n            /sink\n\n\n\nwhere foo is the name of the backend, [language] is the name of a programming\nlanguage. There is one [language] module per programmming language supported by\nthe backend. An optional \"framework\" name can be provided if different\nframeworks of a language are supported and they must generate different code.\n\n\nAll templates follow the same naming convention:\n\n\n\n\n[output type].[template type].tpl\n\n\n\n\n[output type] is the type of file to generate. All backends implement the\n\"source\" output type. The \"source\" templates generate source code. If the\nselected language also needs other files types to be generated, then additional\noutput type templates can be implemented. For example with C or C++ a header\nfile is also needed. So these languages also implement \"header\" output types. So\na backend with support for c contains \"source.content.tpl\" and \"header.content.tpl\"\ntemplates in the serialization modules.\n\n\nMessages\n\n\n\n\nstream creation request\n\n\nstream creation ack\n\n\nstream creation nack\n\n\nstream deletion request\n\n\nstream deletion ack\n\n\nnext item publish\n\n\nstream complete\n\n\nstream error\n\n\n\n\nSerialization\n\n\n\n\nheader.tpl\n\n\ncontent.tpl\n\n\nfooter.tpl\n\n\n\n\nStreams\n\n\nStreams generate Observables proxies that follow the \nObservable Contract",
+            "title": "Backend Development"
+        },
+        {
+            "location": "/backend_dev/#backend-structure",
+            "text": "python package, jinja2 template engine for code generation.  The source layout of a backend is the following one:  rtx_backend_foo\n    /[language[-framework]]            \n        /transport\n        /framing\n        /serialization\n        /observable\n            /source\n            /sink  where foo is the name of the backend, [language] is the name of a programming\nlanguage. There is one [language] module per programmming language supported by\nthe backend. An optional \"framework\" name can be provided if different\nframeworks of a language are supported and they must generate different code.  All templates follow the same naming convention:   [output type].[template type].tpl   [output type] is the type of file to generate. All backends implement the\n\"source\" output type. The \"source\" templates generate source code. If the\nselected language also needs other files types to be generated, then additional\noutput type templates can be implemented. For example with C or C++ a header\nfile is also needed. So these languages also implement \"header\" output types. So\na backend with support for c contains \"source.content.tpl\" and \"header.content.tpl\"\ntemplates in the serialization modules.",
+            "title": "Backend Structure"
+        },
+        {
+            "location": "/backend_dev/#messages",
+            "text": "stream creation request  stream creation ack  stream creation nack  stream deletion request  stream deletion ack  next item publish  stream complete  stream error",
+            "title": "Messages"
+        },
+        {
+            "location": "/backend_dev/#serialization",
+            "text": "header.tpl  content.tpl  footer.tpl",
+            "title": "Serialization"
+        },
+        {
+            "location": "/backend_dev/#streams",
+            "text": "Streams generate Observables proxies that follow the  Observable Contract",
+            "title": "Streams"
+        }
+    ]
+}
