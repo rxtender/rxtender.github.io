@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
+    <meta content="width=device-width, initial-scale=1, maximum-scale=2, user-scalable=no" name="viewport" />
+    <meta content="RxTender, ReactiveX with remote Observables" name="description" />
+    <meta content="Semantic-UI, Theme, Design, Template" name="keywords" />
+    <meta content="R. Picard" name="author" />
+    <meta content="#2C3E50" name="theme-color" />
+    <title>RxTender, ReactiveX with remote Observables.</title>
+    <link href="dist/semantic-ui/semantic.min.css" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/default.css" rel="stylesheet" type="text/css" />
+    <link href="stylesheets/pandoc-code-highlight.css" rel="stylesheet" type="text/css" />
+    <script src="dist/jquery/jquery.min.js"></script>
+  </head>
+  <body>
+    <div class="ui large top fixed hidden menu">
+      <div class="ui container">
+        <a class="active item">RxTender</a><a class="item" href="doc/latest/index.html">Documentation</a>
+        <div class="right menu">
+          <div class="item">
+            <a href="https://github.com/rxtender"><i class="big github icon"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Sidebar Menu-->
+    <div class="ui vertical inverted sidebar menu">
+      <a class="active item">RxTender</a><a class="item" href="doc/latest/index.html">Documentation</a>
+    </div>
+    <!--Page Contents-->
+    <div class="pusher">
+      <div class="ui inverted vertical masthead center aligned segment">
+        <div class="ui container">
+          <div class="ui large secondary inverted pointing menu">
+            <a class="toc item"><i class="sidebar icon"></i></a><a class="active item">RxTender</a><a class="item" href="doc/latest/index.html">Documentation</a>
+            <div class="right item">
+              <a href="https://github.com/rxtender"><i class="big github icon"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="ui text container">
+          <h1 class="ui inverted header">
+            RxTender
+          </h1>
+          <h2>
+            Remote Reactive Streams
+          </h2>
+          <a class="ui primary inverted button" href="doc/latest/index.html">Read the docs</a>
+        </div>
+      </div>
+
+      <div class="ui vertical stripe segment">
+        <div class="ui middle aligned stackable grid container">
+          <div class="row">
+            <div class="eight wide column">
+              <h3 class="ui header">
+                Unify your communication patterns
+              </h3>
+              <p>
+                You already use reactive streams inside your services and applications ? You can now also use reactive streams to communicate between these components.
+              </p>
+            </div>
+            <div class="four wide right floated column">
+              <img class="ui large image" src="images/languages.png" />
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="ui vertical stripe segment">
+        <div class="ui middle aligned stackable grid container">
+          <div class="row">
+            <div class="six wide left floated column">
+              <img class="ui large image" src="images/principles.png" />
+            </div>
+            <div class="eight wide column">
+              <h3 class="ui header">
+                Be more productive
+              </h3>
+                <ul class="ui list">
+                  <li>Specify your streams</li>
+                  <li>Use your existing transport protocol</li>
+                  <li>choose a serialization protocol</li>
+                  <li>choose your programming language</li>
+                </ul>
+              <p>
+                RxTender generates all your Observable proxies.
+              </p>
+              <a class="ui primary button" href="doc/latest/get_started/index.html">Get Started</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="ui vertical stripe segment">
+        <div class="ui text container">
+          <h3 class="ui header">
+            Extend it easily
+          </h3>
+          <p>
+            RxTender is <b>not</b> a code generator: It is a framework that
+            allows easy implementation of reactive stream code generators. If
+            the existing backends do not implement what you need, you can
+            easilly write your own backend as a python package.
+          </p>
+          <p>
+
+          <p>
+          <a class="ui primary button" href="doc/latest/backend_dev/index.html">Read More</a>
+
+          <!--
+          <h4 class="ui horizontal header divider">
+            <a href="homepage.html#"> Compatible with</a>
+          </h4>
+          -->
+
+        </div>
+      </div>
+
+
+      <div class="ui inverted vertical footer segment">
+        <div class="ui container">
+          <div class="ui stackable inverted divided equal height stackable grid">
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="dist/semantic-ui/semantic.min.js"></script>
+    <style type="text/css">
+      .hidden.menu {
+        display: none;
+      }
+
+      .masthead.segment {
+        min-height: 600px;
+        padding: 1em 0em;
+      }
+      .masthead .logo.item img {
+        margin-right: 1em;
+      }
+      .masthead .ui.menu .ui.button {
+        margin-left: 0.5em;
+      }
+      .masthead h1.ui.header {
+        margin-top: 2em;
+        margin-bottom: 0em;
+        font-size: 4em;
+        font-weight: normal;
+      }
+      .masthead h2 {
+        font-size: 1.7em;
+        font-weight: normal;
+      }
+
+      .ui.vertical.stripe {
+        padding: 8em 0em;
+      }
+      .ui.vertical.stripe h3 {
+        font-size: 2em;
+      }
+      .ui.vertical.stripe .button + h3,
+      .ui.vertical.stripe p + h3 {
+        margin-top: 3em;
+      }
+      .ui.vertical.stripe .floated.image {
+        clear: both;
+      }
+      .ui.vertical.stripe p {
+        font-size: 1.33em;
+      }
+      .ui.vertical.stripe .horizontal.divider {
+        margin: 3em 0em;
+      }
+
+      .quote.stripe.segment {
+        padding: 0em;
+      }
+      .quote.stripe.segment .grid .column {
+        padding-top: 5em;
+        padding-bottom: 5em;
+      }
+
+      .footer.segment {
+        padding: 5em 0em;
+      }
+
+      .secondary.pointing.menu .toc.item {
+        display: none;
+      }
+
+      @media only screen and (max-width: 700px) {
+        .ui.fixed.menu {
+          display: none !important;
+        }
+        .secondary.pointing.menu .item,
+        .secondary.pointing.menu .menu {
+          display: none;
+        }
+        .secondary.pointing.menu .toc.item {
+          display: block;
+        }
+        .masthead.segment {
+          min-height: 350px;
+        }
+        .masthead h1.ui.header {
+          font-size: 2em;
+          margin-top: 1.5em;
+        }
+        .masthead h2 {
+          margin-top: 0.5em;
+          font-size: 1.5em;
+        }
+      }
+    </style>
+    <script>
+      $(document)
+        .ready(function() {
+          // fix menu when passed
+          $('.masthead')
+            .visibility({
+              once: false,
+              onBottomPassed: function() {
+                $('.fixed.menu').transition('fade in');
+              },
+              onBottomPassedReverse: function() {
+                $('.fixed.menu').transition('fade out');
+              }
+            })
+          ;
+
+          // create sidebar and attach to menu open
+          $('.ui.sidebar')
+            .sidebar('attach events', '.toc.item')
+          ;
+        })
+      ;
+    </script>
+  </body>
+</html>
