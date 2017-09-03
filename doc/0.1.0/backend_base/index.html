@@ -150,9 +150,13 @@
         "streamId": {
           "description": "Id of the stream to create",
           "type": "number"
+        },
+        "args": {
+          "description": "arguments used to create the stream",
+          "type": "array"
         }
     },
-    "required": ["what", "streamType"]
+    "required": ["what", "streamType", "streamId", "args"]
 }
 </code></pre>
 <p>example:</p>
@@ -234,7 +238,7 @@
       }
 }
 </code></pre>
-<p>Completed item message:</p>
+<p>Completed message:</p>
 <pre><code>{
     "title": "Completed Message",
     "type": "object",
@@ -252,7 +256,7 @@
     "what": "completed"
 }
 </code></pre>
-<p>Error item message:</p>
+<p>Error message:</p>
 <pre><code>{
     "title": "Error Message",
     "type": "object",
