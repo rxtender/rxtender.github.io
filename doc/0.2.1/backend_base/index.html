@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Base Backend - RxTender User Manual</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Base Backend";
+    var mkdocs_page_input_path = "backend_base.md";
+    var mkdocs_page_url = "/backend_base/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> RxTender User Manual</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../rationale/">Rationale</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../get_started/">Get Started</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../com_pattern/">Communication Patterns</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../language/">Language</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Base Backend</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#serialization">Serialization</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#json">JSON</a></li>
+        
+        </ul>
+    
+
+    <li class="toctree-l2"><a href="#python">Python</a></li>
+    
+
+    <li class="toctree-l2"><a href="#es2015">ES2015</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../backend_dev/">Backend Development</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">RxTender User Manual</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Base Backend</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="serialization">Serialization</h2>
+<h3 id="json">JSON</h3>
+<p>Creation message:</p>
+<pre><code>{
+    "title": "Create Message",
+    "type": "object",
+    "properties": {
+        "what": {
+            "description": "the message type. Value is 'create'",
+            "type": "string"
+        },
+        "streamType": {
+            "description": "The type of stream to create",
+            "type": "string"
+        },
+        "streamId": {
+          "description": "Id of the stream to create",
+          "type": "number"
+        },
+        "args": {
+          "description": "arguments used to create the stream",
+          "type": "array"
+        }
+    },
+    "required": ["what", "streamType", "streamId", "args"]
+}
+</code></pre>
+<p>example:</p>
+<pre><code>{
+    "what": "create",
+    "streamType": "ClockTickStream",
+    "id": 42,
+    "args": []
+}
+</code></pre>
+<p>Creation success message:</p>
+<p>example:</p>
+<pre><code>{
+    "what": "createAck",
+    "streamId": 42
+}
+</code></pre>
+<p>Creation failure message:</p>
+<p>example:</p>
+<pre><code>{
+    "what": "createNack",
+    "streamId": 42,
+    "reason": "nomem"
+}
+</code></pre>
+<p>Deletion message:</p>
+<pre><code>{
+    "title": "Delete Message",
+    "type": "object",
+    "properties": {
+        "what": {
+            "description": "the message type. Value is 'delete'",
+            "type": "string"
+        },
+        "streamId": {
+          "description": "Id of the stream to delete",
+          "type": "number"
+        }
+    },
+    "required": ["what", "streamId"]
+}
+</code></pre>
+<p>example:</p>
+<pre><code>{
+    "what": "delete",
+    "id": 42
+}
+</code></pre>
+<p>Deletion success message:</p>
+<p>example:</p>
+<pre><code>{
+    "what": "deleteAck",
+    "streamId": 42
+}
+</code></pre>
+<p>Next item message:</p>
+<pre><code>{
+    "title": "Next Message",
+    "type": "object",
+    "properties": {
+        "what": {
+            "description": "the message type. Value is 'next'",
+            "type": "string"
+        },
+        "item": {
+            "description": "the serialized item",
+            "type": "object"
+        },
+    },
+    "required": ["what", "item"]
+}
+</code></pre>
+<p>example:</p>
+<pre><code>{
+    "what": "next",
+    "item": {
+        "foo": 42,
+        "bar": "buzz"
+      }
+}
+</code></pre>
+<p>Completed message:</p>
+<pre><code>{
+    "title": "Completed Message",
+    "type": "object",
+    "properties": {
+        "what": {
+            "description": "the message type. Value is 'completed'",
+            "type": "string"
+        },
+    },
+    "required": ["what"]
+}
+</code></pre>
+<p>example:</p>
+<pre><code>{
+    "what": "completed"
+}
+</code></pre>
+<p>Error message:</p>
+<pre><code>{
+    "title": "Error Message",
+    "type": "object",
+    "properties": {
+        "what": {
+            "description": "the message type. Value is 'error'",
+            "type": "string"
+        },
+        "message": {
+            "description": "A message containing information about the error",
+            "type": "string"
+        },
+    },
+    "required": ["what", "message"]
+}
+</code></pre>
+<p>example:</p>
+<pre><code>{
+    "what": "completed"
+}
+</code></pre>
+<h2 id="python">Python</h2>
+<h2 id="es2015">ES2015</h2>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../backend_dev/" class="btn btn-neutral float-right" title="Backend Development">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../language/" class="btn btn-neutral" title="Language"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../language/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../backend_dev/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
