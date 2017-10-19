@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Get Started - RxTender User Manual</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="../css/highlight.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Get Started";
+    var mkdocs_page_input_path = "get_started.md";
+    var mkdocs_page_url = "/get_started/";
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js"></script>
+  <script src="../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../js/highlight.pack.js"></script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> RxTender User Manual</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Introduction</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../rationale/">Rationale</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Get Started</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#stream-definition">Stream Definition</a></li>
+    
+
+    <li class="toctree-l2"><a href="#the-python-server">The python server</a></li>
+    
+
+    <li class="toctree-l2"><a href="#nodejs-client">NodeJS client</a></li>
+    
+
+    <li class="toctree-l2"><a href="#running-it-all">Running it all</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../com_pattern/">Communication Patterns</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../language/">Language</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../backend_base/">Base Backend</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../backend_dev/">Backend Development</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">RxTender User Manual</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Get Started</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>This is the "not so short" getting started tutorial of RxTender. In this
+tutorial you will learn to use reactive streams to communicate between python
+and javascript code.</p>
+<p>Let's consider the following situation: Your team develops a product that is
+composed of two services, using different programming languages (javascript and
+python). You use Reactive Streams in both components and you need to communicate
+between them. This is exactly where RxTender can help you: Generate reactive
+streams bindings between your services.</p>
+<p>Your user story is the following one:</p>
+<p>As an end user using a terminal console I use a command line application to
+count from 1 to 10. Since such a computation is very complex, this CLI
+application asks another service to do it.</p>
+<p>You ended up with the following technical choices:</p>
+<ul>
+<li>The client application is developed in javascript/NodeJS.</li>
+<li>The server is developed in python.</li>
+<li>TCP is used as a transport protocol.</li>
+<li>JSON is used as a serialization protocol.</li>
+<li>JSON lines us used as a framing protocol.</li>
+</ul>
+<h2 id="stream-definition">Stream Definition</h2>
+<p>The first thing to do is to write the stream specifications. We want 3 arguments
+to create our counter: Its initial value, its end value, and its increase step.
+The stream specification is written in an IDL whose syntax is heavily inspired
+from rust. Save the following code to a file named "counter.rxt":</p>
+<pre><code>struct CounterItem {
+    value: i32;
+}
+
+struct CounterError {
+    message :string;
+}
+
+stream Counter(start: i32, end: i32, step: i32) -&gt; Stream&lt;CounterItem, CounterError&gt;;
+</code></pre>
+
+<p>First there is the definition of the type of items that are emitted on the
+stream. They are named "CounterItem" and contain a single field named "value".
+The type of this field is a signed 32 bits integer (i32).</p>
+<p>Then there is the definition of the error type associated to the stream. The
+COunterError struct contains a single string field named "message".</p>
+<p>Finally there is the definition of the stream. It is named "Counter". It takes 3
+creation arguments: start, end, and step. This stream will emit items of type
+CounterItem, and raise errors of type CounterError.</p>
+<h2 id="the-python-server">The python server</h2>
+<p>Now let's code the python server, based on asyncio. We first start from a sample
+asyncio TCP server:</p>
+<pre><code class="python">import asyncio
+
+class CounterServerProtocol(asyncio.Protocol):
+    def connection_made(self, transport):
+        peername = transport.get_extra_info('peername')
+        print('Connection from {}'.format(peername))
+
+    def connection_lost(self, exc):
+        print('connection lost')
+        return
+
+    def data_received(self, data):
+        return
+
+loop = asyncio.get_event_loop()
+# Each client connection will create a new protocol instance
+coro = loop.create_server(CounterServerProtocol, '127.0.0.1', 9999)
+server = loop.run_until_complete(coro)
+
+print('Serving on {}'.format(server.sockets[0].getsockname()))
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+
+server.close()
+loop.run_until_complete(server.wait_closed())
+loop.close()
+</code></pre>
+
+<p>Each time a client connects to the server, a new CounterServerProtocol object is
+created and its "connection_made" method is called. The first thing to do is
+importing the definitions we will need:</p>
+<pre><code class="diff">import asyncio
+
++from rx import Observable
++from counter_rxt import frame, unframe, Router, CounterItem
+</code></pre>
+
+<p>Note that we use RxPy here, but we could use other reactive stream libraries.
+The we must provide a factory function to create the counter stream when a
+request is received from the network:</p>
+<pre><code class="diff">+Router.set_Counter_factory(create_counter_stream)
+loop = asyncio.get_event_loop()
+# Each client connection will create a new protocol instance
+</code></pre>
+
+<p>"Router.set_Counter_factory" is a static method of the Router class. RxTender
+generates one of these methods per stream declared in the rxt file. We will
+write the create_counter_stream function later. We will now create a Router
+object each time a new connection is made:</p>
+<pre><code class="diff">def connection_made(self, transport):
+    peername = transport.get_extra_info('peername')
+    print('Connection from {}'.format(peername))
++    self.router = Router(FramedTransport(transport))
++    self.frame_context = ''
+</code></pre>
+
+<p>The router object contains the implementation that routes network messages
+to/from streams. It is also in charge of (de)serializing these messages. Its
+constructor takes a transport object as an argument. This transport object must
+implement a "write" method to write data on the network connection. Note that we
+did not use the "transport" argument directly: Since we use TCP (a stream based
+protocol), we need add framing on top of it so that we receive messages
+correctly. This is what is done by the FramedTransport class:</p>
+<pre><code class="python">class FramedTransport(object):
+    def __init__(self, transport):
+        self.transport = transport
+
+    def write(self, data):
+        self.transport.write(frame(data).encode())
+</code></pre>
+
+<p>In the write method, each message is "framed" with the JSON-lines protocol
+before being sent. On the other way, all received packets are "unframed" before
+they are provided to the Router:</p>
+<pre><code class="diff">def data_received(self, data):
++    message = data.decode()
++    self.frame_context, packets = unframe(self.frame_context, message)
++    for packet in packets:
++        self.router.on_message(packet)
+</code></pre>
+
+<p>From that point we created a Router, it receives all messages from the network
+and can send messages. We finally need to implement create_counter_stream that
+will be called each time a new stream subscription request comes:</p>
+<pre><code class="python">def delete_counter_subscription(stream):
+    stream = None
+
+def create_counter_stream(start, end, step):
+    source = Observable.from_(range(start,end+1, step)).map(
+        lambda i: CounterItem(i))
+    return lambda n,c,e: subscribe_counter_stream(source, n, c, e), lambda: delete_counter_subscription(source)
+
+def subscribe_counter_stream(stream, next, completed, error):
+    stream.subscribe(
+        lambda i: next(i),
+        lambda e: error(e),
+        lambda: completed())
+</code></pre>
+
+<p>create_counter_stream takes 3 arguments as input: The ones that we specified in the rxt file. It returns 2 functions:</p>
+<ul>
+<li>A function to subscribe to this stream</li>
+<li>A function to delete this stream</li>
+</ul>
+<p>The subscription function is called with 3 function arguments (next, error,
+completed). Each time the corresponding event occurs on the source stream, then
+these functions must be called to forward the event on the transport layer.</p>
+<p>Here is the complete code of the server. Save it to a file named "server.py":</p>
+<pre><code class="python">import asyncio
+
+from rx import Observable
+from counter_rxt import frame, unframe, Router, CounterItem
+
+class FramedTransport(object):
+    def __init__(self, transport):
+        self.transport = transport
+
+    def write(self, data):
+        self.transport.write(frame(data).encode())
+
+class CounterServerProtocol(asyncio.Protocol):
+    def connection_made(self, transport):
+        peername = transport.get_extra_info('peername')
+        print('Connection from {}'.format(peername))
+        self.router = Router(FramedTransport(transport))
+        self.frame_context = ''
+
+    def connection_lost(self, exc):
+        print('connection lost')
+        return
+
+    def data_received(self, data):
+        message = data.decode()
+        self.frame_context, packets = unframe(self.frame_context, message)
+        for packet in packets:
+            self.router.on_message(packet)
+
+def delete_counter_subscription(stream):
+    stream = None
+
+def create_counter_stream(start, end, step):
+    source = Observable.from_(range(start,end+1, step)).map(
+        lambda i: CounterItem(i))
+    return lambda n,c,e: subscribe_counter_stream(source, n, c, e), lambda: delete_counter_subscription(source)
+
+def subscribe_counter_stream(stream, next, completed, error):
+    stream.subscribe(
+        lambda i: next(i),
+        lambda e: error(e),
+        lambda: completed())
+
+Router.set_Counter_factory(create_counter_stream)
+loop = asyncio.get_event_loop()
+# Each client connection will create a new protocol instance
+coro = loop.create_server(CounterServerProtocol, '127.0.0.1', 9999)
+server = loop.run_until_complete(coro)
+
+print('Serving on {}'.format(server.sockets[0].getsockname()))
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    pass
+
+server.close()
+loop.run_until_complete(server.wait_closed())
+loop.close()
+</code></pre>
+
+<h2 id="nodejs-client">NodeJS client</h2>
+<p>For the nodejs client, we start with a TCP client, implemented as a function
+that returns a stream of stream:</p>
+<pre><code class="javascript">import {Observable, Subject} from 'rxjs';
+import {Socket} from 'net';
+let connection = [];
+
+function createConnection(id, host, port) {
+  const state$ = Observable.create(stateObserver =&gt; {
+    let dataObserver = null;
+    const data$ = Observable.create(observer =&gt; {
+      dataObserver = observer;
+    });
+
+    connection[id] = new Socket();
+    connection[id].setEncoding('utf8');
+    connection[id].connect(port, host, function() {
+        console.log('CONNECTED TO: ' + host + ':' + port);
+        stateObserver.next({
+          &quot;linkId&quot;: id,
+          &quot;stream&quot;: data$
+        })
+    });
+
+    connection[id].on('data', function(data) {
+      dataObserver.next(data);
+    });
+
+    connection[id].on('close', function() {
+        dataObserver.complete();
+        stateObserver.complete();
+        connection.splice(id, 1);
+    });
+  });
+
+  return state$;
+}
+</code></pre>
+
+<p>This function returns a stream that emits a stream when the connection is
+established. This latter stream then emits items each time some data is received
+on the socket. This function is used from a factory function that takes another
+stream as input:</p>
+<pre><code class="javascript">function tcpClient(sink$) {
+  sink$.subscribe( (i) =&gt; {
+    connection[i.linkId].write(i.data);
+  });
+
+  return {
+    &quot;connect&quot; : createConnection
+  };
+}
+</code></pre>
+
+<p>Each item of the sink stream contains the data to write on the tcp socket.
+We will also use log function:</p>
+<pre><code class="javascript">function consoleDriver(sink$) {
+  sink$.subscribe( (i) =&gt; {
+    console.log('console: ' + i);
+  });
+}
+</code></pre>
+
+<p>Now we can implement our logic:</p>
+<pre><code class="javascript">import { router } from './counter_rxt.js';
+
+function main(sources) {
+  const linkRcv$ = sources.LINK.connect('counter', 'localhost', 9999);
+  const returnChannel$ = sources.ROUTER.linkData();
+  const console$ = sources.ROUTER.link()
+    .map( i =&gt; {
+      return sources.ROUTER.Counter(i.linkId, 1,10,1)
+    })
+    .mergeAll()
+    .map( i =&gt; i.value);;
+
+  return {
+   ROUTER: linkRcv$,
+   LINK: returnChannel$,
+   CONSOLE: console$
+  };
+}
+</code></pre>
+
+<p>The sources parameter contains objects returned by the tcp client factory, the
+console factory, and the router factory. This main function creates a Counter
+observable when the tcp connection is established, i.e. when an item is emitted
+on the sources.ROUTER.link() stream. The result of the counter is returned in
+the CONSOLE field, and will be connected to the console output.</p>
+<p>All streams are finally connected together:</p>
+<pre><code class="javascript">const consoleProxy$ = new Subject();
+const routerProxy$ = new Subject();
+const linkProxy$ = new Subject();
+
+const sources = {
+  CONSOLE: consoleDriver(consoleProxy$),
+  ROUTER: router(routerProxy$),
+  LINK: tcpClient(linkProxy$)
+};
+
+const sinks = main(sources);
+
+sinks.ROUTER.subscribe(routerProxy$);
+sinks.LINK.subscribe(linkProxy$);
+sinks.CONSOLE.subscribe(consoleProxy$);
+</code></pre>
+
+<p>Here is the complete code of the client. Save it to a file named
+"client.es6.js":</p>
+<pre><code class="javascript">import {Observable, Subject} from 'rxjs';
+import {
+  router,
+} from './counter_rxt.js';
+import {Socket} from 'net';
+
+let connection = [];
+
+function createConnection(id, host, port) {
+  const state$ = Observable.create(stateObserver =&gt; {
+    let dataObserver = null;
+    const data$ = Observable.create(observer =&gt; {
+      dataObserver = observer;
+    });
+
+    connection[id] = new Socket();
+    connection[id].setEncoding('utf8');
+    connection[id].connect(port, host, function() {
+        console.log('CONNECTED TO: ' + host + ':' + port);
+        stateObserver.next({
+          &quot;linkId&quot;: id,
+          &quot;stream&quot;: data$
+        })
+    });
+
+    connection[id].on('data', function(data) {
+      dataObserver.next(data);
+    });
+
+    connection[id].on('close', function() {
+        dataObserver.complete();
+        stateObserver.complete();
+        connection.splice(id, 1);
+    });
+  });
+
+  return state$;
+}
+
+function tcpClient(sink$) {
+  sink$.subscribe( (i) =&gt; {
+    connection[i.linkId].write(i.data);
+  });
+
+  return {
+    &quot;connect&quot; : createConnection
+  };
+}
+
+function consoleDriver(sink$) {
+  sink$.subscribe( (i) =&gt; {
+    console.log('console: ' + i);
+  });
+}
+
+function main(sources) {
+  const linkRcv$ = sources.LINK.connect('counter', 'localhost', 9999);
+  const returnChannel$ = sources.ROUTER.linkData();
+  const console$ = sources.ROUTER.link()
+    .map( i =&gt; {
+      return sources.ROUTER.Counter(i.linkId, 1,10,1)
+    })
+    .mergeAll()
+    .map( i =&gt; i.value);;
+
+  return {
+   ROUTER: linkRcv$,
+   LINK: returnChannel$,
+   CONSOLE: console$
+  };
+}
+
+const consoleProxy$ = new Subject();
+const routerProxy$ = new Subject();
+const linkProxy$ = new Subject();
+
+const sources = {
+  CONSOLE: consoleDriver(consoleProxy$),
+  ROUTER: router(routerProxy$),
+  LINK: tcpClient(linkProxy$)
+};
+
+const sinks = main(sources);
+
+sinks.ROUTER.subscribe(routerProxy$);
+sinks.LINK.subscribe(linkProxy$);
+sinks.CONSOLE.subscribe(consoleProxy$);
+</code></pre>
+
+<h2 id="running-it-all">Running it all</h2>
+<p>Now that all code is there, let's start both components. We will first Build the
+python bindings. First install the base backend on your system:</p>
+<pre><code class="shell">pip3 install rxt-backend-base
+</code></pre>
+
+<p>Then generate the proxy code corresponding to the Counter IDL:</p>
+<pre><code class="shell">rxtender \
+--framing rxt_backend_base.python3.framing.newline \
+--serialization rxt_backend_base.python3.serialization.json \
+--stream rxt_backend_base.python3.stream \
+--input counter.rxt --output counter_rxt.py
+</code></pre>
+
+<p>rxtender is invoked with 3 generation arguments (framing, serialization, and
+stream). Each parameter corresponds to an available code generator in the
+backend.</p>
+<p>Then we build the javascript bindings. In order to ease generation and
+translation from es6 to es5 we use npm with babel:</p>
+<p>Javascript NPM package.json:</p>
+<pre><code class="json">{
+  &quot;name&quot;: &quot;counter-example&quot;,
+  &quot;version&quot;: &quot;0.2.0&quot;,
+  &quot;description&quot;: &quot;es2015/python3 rxtender counter example&quot;,
+  &quot;license&quot;: &quot;MIT&quot;,
+  &quot;main&quot;: &quot;client.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;generate:counter&quot;: &quot;rxtender --framing rxt_backend_base.es2015.framing.newline --serialization rxt_backend_base.es2015.serialization.json --stream rxt_backend_base.es2015_rxjs.stream --input counter.rxt --output counter_rxt.es6.js&quot;,
+    &quot;build:counter&quot;: &quot;npm run generate:counter &amp;&amp; babel --presets es2015 counter_rxt.es6.js --out-file counter_rxt.js&quot;,
+    &quot;build:client&quot;: &quot;npm run build:counter &amp;&amp; babel --presets es2015 client.es6.js --out-file client.js&quot;,
+    &quot;build&quot;: &quot;npm run build:client&quot;,
+    &quot;start&quot;: &quot;node client.js&quot;
+  },
+  &quot;dependencies&quot;: {},
+  &quot;devDependencies&quot;: {
+    &quot;babel-cli&quot;: &quot;^6.24.1&quot;,
+    &quot;babel-core&quot;: &quot;^6.25.0&quot;,
+    &quot;babel-preset-es2015&quot;: &quot;^6.24.1&quot;,
+    &quot;rxjs&quot;: &quot;^5.4.3&quot;
+  }
+}
+</code></pre>
+
+<p>The stream argument provided to rxtender generates an es2015 rxjs router
+function. Since we use a TCP connection, and TCP is a stream protocol, we need
+some framing to encapsulate each item of the stream. Here we use new lines
+framing, as specified with the framing argument. With the serialization argument
+we asked rxtender to generate json serialization of all structs defined in the
+IDL. To generate the code, install npm dependencies and run rxtender:</p>
+<pre><code class="shell">npm install
+npm run build
+</code></pre>
+
+<p>Now everything is ready, we can start the python server:</p>
+<pre><code class="shell">python3 server.py
+</code></pre>
+
+<p>and run the javascript client:</p>
+<pre><code class="shell">npm start
+</code></pre>
+
+<p>You should get the following output:</p>
+<pre><code class="shell">&gt; counter-example@0.2.0 start /Users/bipbip/Documents/devel/rxtender/test
+&gt; node client.js
+
+CONNECTED TO: 127.0.0.1:9999
+creating observable
+tick: 1
+tick: 2
+tick: 3
+tick: 4
+tick: 5
+tick: 6
+tick: 7
+tick: 8
+tick: 9
+tick: 10
+completed
+</code></pre>
+
+<p>Yeah! With only few lines of codes you used reactive streams to communicate
+between two processes written in different programming languages. You can now
+add other streams in the rxt file. All these streams will be multiplexed in
+the same socket. Moreover, if you want to change the serialization or framing
+protocol, then you do not need to change anything in your code: Just select
+other ones when invoking rxtender.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../com_pattern/" class="btn btn-neutral float-right" title="Communication Patterns">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../rationale/" class="btn btn-neutral" title="Rationale"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+	  
+        </div>
+      </div>
+
+    </section>
+    
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../rationale/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../com_pattern/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script src="../js/theme.js"></script>
+
+</body>
+</html>
